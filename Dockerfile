@@ -1,4 +1,4 @@
-FROM php:8.1-fpm
+FROM php:8.2-fpm
 
 # Install system dependencies and PHP extensions
 RUN apt-get update && apt-get install -y \
@@ -19,17 +19,20 @@ WORKDIR /var/www
 
 # Copy composer files and run composer install
 COPY composer.json composer.lock* ./
-RUN composer install --no-scripts --no-autoloader
+RUN composer install --no-scripts
 
 # Copy the rest of the application
 COPY . .
 
-# Generate the autoloader
-RUN composer dump-autoload
+# # Generate the autoloader
+# RUN composer dump-autoload
 
 # Set permissions
 RUN chown -R www-data:www-data /var/www
 
+# Ensure artisan file is executable
+RUN chmod +x /var/www/artisan
+
 # Expose port and start server
-EXPOSE 8880
+EXPOSE 8080
 CMD php artisan serve --host=0.0.0.0 --port=8880
